@@ -11,6 +11,8 @@ import com.ecom.repository.OrderRepository;
 import com.ecom.repository.UserRepository;
 import com.ecom.service.security.SecurityConfig;
 import lombok.AllArgsConstructor;
+
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,10 +28,24 @@ public class UserService {
     private final SecurityConfig securityConfig;
     private final OrderRepository orderRepository;
 
+    public String getCurrentUserEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
+    }
+
+    public boolean isAdmin() {
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
     public UserResponse getUserById(int id) {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("User with id:" + id + " was not found.")
         );
+        String currentUserEmail = getCurrentUserEmail();
+        if (!isAdmin() && !user.getEmail().equals(currentUserEmail)) {
+            throw new AccessDeniedException("You cannot access this user's account");
+        }
         return new UserResponse(user);
     }
 
@@ -44,6 +60,10 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("User with id:" + id + " was not found.")
         );
+        String currentUserEmail = getCurrentUserEmail();
+        if (!isAdmin() && !user.getEmail().equals(currentUserEmail)) {
+            throw new AccessDeniedException("You cannot access this user's account");
+        }
         userRepository.deleteById(id);
         return user.getId();
     }
@@ -59,6 +79,10 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("User with id:" + id + " was not found.")
         );
+        String currentUserEmail = getCurrentUserEmail();
+        if (!isAdmin() && !user.getEmail().equals(currentUserEmail)) {
+            throw new AccessDeniedException("You cannot access this user's account");
+        }
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
@@ -70,8 +94,7 @@ public class UserService {
     }
 
     public List<OrderResponse> getUserOrders() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
+        String email = getCurrentUserEmail();
         User user = userRepository.getUserByEmail(email).orElseThrow(
                 () -> new UserNotFoundException("User with email:" + email + " was not found.")
         );

@@ -5,7 +5,9 @@ import com.ecom.dto.user.UserResponse;
 import com.ecom.dto.user.UserRequest;
 import com.ecom.service.UserService;
 import lombok.AllArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +25,7 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }

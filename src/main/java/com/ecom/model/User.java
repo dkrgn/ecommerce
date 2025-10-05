@@ -1,5 +1,6 @@
 package com.ecom.model;
 
+import com.ecom.dto.register.RegistrationRequest;
 import com.ecom.dto.user.UserRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -45,5 +46,14 @@ public class User {
         this.address = userRequest.getAddress();
         this.password = userRequest.getPassword();
         this.role = userRequest.getRole();
+    }
+
+    public User(RegistrationRequest registrationRequest) {
+        this.name = registrationRequest.getName();
+        this.email = registrationRequest.getEmail();
+        this.phone = registrationRequest.getPhone();
+        this.address = registrationRequest.getAddress();
+        this.password = registrationRequest.getPassword();
+        this.role = Role.CUSTOMER;
     }
 }
