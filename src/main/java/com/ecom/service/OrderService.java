@@ -37,11 +37,11 @@ public class OrderService {
         return new OrderResponse(order);
     }
 
-    public int deleteOrderById(int id) {
+    public OrderResponse deleteOrderById(int id) {
         Order order = orderRepository.getOrderById(id).orElseThrow(
                 () -> new OrderNotFoundException("Order not found")
         );
         orderRepository.delete(order);
-        return order.getId();
+        return new OrderResponse(order);
     }
 }

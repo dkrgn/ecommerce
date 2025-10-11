@@ -8,6 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 @RequestMapping("/categories")
 @AllArgsConstructor
@@ -35,9 +39,11 @@ public class CategoryController {
     public ResponseEntity<CategoryResponse> addCategory(@RequestBody CategoryRequest categoryRequest) {
         return ResponseEntity.ok(categoryService.addCategory(categoryRequest));
     }
-
-//    public ResponseEntity<CategoryResponse> updateCategory(CategoryRequest categoryRequest) {
-//        return
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryResponse> updateCategory(
+        @PathVariable int id, 
+        @RequestBody CategoryRequest categoryRequest) {
+        return ResponseEntity.ok(categoryService.updateCategory(id, categoryRequest));
+    }
 
 }
